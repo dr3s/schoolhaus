@@ -11,7 +11,7 @@ import play.api.libs.openid.OpenID
 object Application extends Controller with Secured {
    
   def index = IsAuthenticated { username => _ =>
-    Ok(
+    Ok( 
         html.index(username)
       )
   }
@@ -32,6 +32,20 @@ object Application extends Controller with Secured {
   def login = Action { implicit request =>
     Ok(html.login(loginForm))
   }
+  
+  /**
+   * OpenId VerifyId.
+   */
+  def verifyid = Action { implicit request =>
+    AsyncResult {
+       OpenID.verifiedId(request).map {
+         
+         userInfo => Ok( html.index(userInfo.attributes.getOrElse("email", "unknown")))
+       }
+      }
+    
+               
+  }
 
   /**
    * Handle login form submission.
@@ -40,7 +54,7 @@ object Application extends Controller with Secured {
     loginForm.bindFromRequest.fold(
       formWithErrors => BadRequest(html.login(formWithErrors)),
       user => Async {
-        		OpenID.redirectURL(user._1, "http://www.test.com").map(i => Redirect( i, 302) )
+        		OpenID.redirectURL(user._1, routes.Application.verifyid.absoluteURL(), List("email" -> "http://schema.openid.net/contact/email") ).map(i => Redirect( i, 302) )
         }
     )
     
