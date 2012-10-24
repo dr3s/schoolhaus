@@ -5,14 +5,67 @@
         <title>Zentasks</title>
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
         <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("bootstrap/css/bootstrap.min.css")">
-    </head>
+    	<link type="text/css" rel="stylesheet" media="screen" href="@routes.Assets.at("openid-selector/css/openid.css")" />
+    	
+        <script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
+		<script type="text/javascript" src="@routes.Assets.at("openid-selector/js/openid-jquery.js")"></script>
+		<script type="text/javascript" src="@routes.Assets.at("openid-selector/js/openid-en.js")"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				openid.init('openid');
+			});
+		</script>
+		<!-- /Simple OpenID Selector -->
+		<style type="text/css">
+			/* Basic page formatting */
+			body {
+				font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+			}
+		</style>
+	</head>
     <body>
         
         <header>
             <a href="@routes.Application.index" id="logo"><span>Zen</span>tasks</a>
         </header>
         
-        @helper.form(routes.Application.authenticate) {
+        @helper.form(action = routes.Application.loginWithOpenId, 'id -> "openid_form") {
+            
+            <legend>Sign-in or Create New Account</legend>
+            
+            @form.globalError.map { error =>
+                <p class="error">
+                    @error.message
+                </p>
+            }
+            
+            @flash.get("success").map { message =>
+                <p class="success">
+                    @message
+                </p>
+            }
+            
+            <div id="openid_choice">
+				<p>Please click your account provider:</p>
+				<div id="openid_btns"></div>
+			</div>
+			<div id="openid_input_area">
+				<input id="openid" name="openid" type="text" value="@form("openid").value" />
+				<input id="openid_submit" type="submit" value="Sign-In"/>
+			</div>
+			<noscript>
+				<p>OpenID is service that allows you to log-on to many different websites using a single indentity.
+				Find out <a href="http://openid.net/what/">more about OpenID</a> and <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.</p>
+			</noscript>
+			
+        
+            
+            
+			
+            
+        }
+        
+       @helper.form(routes.Application.authenticate) {
             
             <h1>Sign in</h1>
             
@@ -29,7 +82,7 @@
             }
             
             <p>
-                <input type="text" name="email" placeholder="Email" id="email" value="@form("email").value">
+                <input type="email" name="email" placeholder="Email" id="email" value="@form("email").value">
             </p>
             <p>
                 <input type="password" name="password" id="password" placeholder="Password">

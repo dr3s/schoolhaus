@@ -10,12 +10,20 @@ trait Secured {
   /**
    * Retrieve the connected user email.
    */
-  private def username(request: RequestHeader) = request.session.get("email")
+  private def username(request: RequestHeader) = {
+    val e = request.session.get("email")
+    Logger.info("email in session: " + e);
+    e
+  }
+  
+
 
   /**
    * Redirect to login if the user in not authorized.
    */
-  private def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.Application.login)
+  private def onUnauthorized(request: RequestHeader) = {
+    Results.Redirect(routes.Application.login)
+  }
   
   // --
   
